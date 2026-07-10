@@ -1,0 +1,29 @@
+{
+  "employees": [
+    {
+      "id": 1,
+      "email": "shubham@gmail.com",
+      "password": "123"
+    },
+    {
+      "id": 2,
+      "email": "rahul@gmail.com",
+      "password": "123"
+    },
+    {
+      "id": 3,
+      "email": "amit@gmail.com",
+      "password": "123"
+    },
+    {
+      "id": 4,
+      "email": "priya@gmail.com",
+      "password": "123"
+    },
+    {
+      "id": 5,
+      "email": "neha@gmail.com",
+      "password": "123"
+    }
+  ]
+}
