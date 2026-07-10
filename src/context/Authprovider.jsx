@@ -1,120 +1,303 @@
+// ==========================================
+// React Hooks Import
+// ==========================================
+
+// createContext -> Context तयार करण्यासाठी
+// useEffect -> Component Load झाल्यावर Code चालवण्यासाठी
+// useState -> State तयार करण्यासाठी
 import { createContext, useEffect, useState } from "react";
+
+// Local Storage Functions Import
 import { getLocalStorage, setLocalStorage } from "../utils/localStorage";
 
+// ==========================================
+// Context तयार केला.
+// ==========================================
 export const AuthContext = createContext();
 
+// ==========================================
+// AuthProvider Component
+// ==========================================
 export default function Authprovider({ children }) {
+
+  // ==========================================
+  // State
+  // ==========================================
+
+  // employees आणि admin data Store करतो.
   const [userData, setUserData] = useState({
+
     employees: [],
+
     admin: [],
+
   });
+
+  // Data Loading साठी State
   const [loading, setLoading] = useState(true);
 
+  // ==========================================
+  // Component पहिल्यांदा Load झाला की चालेल.
+  // ==========================================
   useEffect(() => {
-    // LocalStorage सेट करा
+
+    // जर Local Storage मध्ये employees नसतील
     if (!localStorage.getItem("employees")) {
+
+      // Default Data Store करतो.
       setLocalStorage();
+
     }
 
+    // Local Storage मधून Data घेतो.
     const data = getLocalStorage();
+
+    // State Update
     setUserData(data);
+
+    // Loading संपले.
     setLoading(false);
+
   }, []);
 
-  // ✅ handleLogin function - context मध्ये add केली
+  // ==========================================
+  // Login Function
+  // ==========================================
   const handleLogin = (email, password) => {
-    console.log("handleLogin called with:", email, password); // Debug log
-    
-    // Admin Login Check
+
+    console.log("handleLogin called");
+
+    // -------------------------------
+    // Admin Check
+    // -------------------------------
     const admin = userData.admin.find(
-      (a) => a.email === email && a.password === password
+
+      (a) =>
+
+        a.email === email &&
+        a.password === password
+
     );
 
+    // Admin Login Success
     if (admin) {
-      console.log("Admin login success");
+
+      console.log("Admin Login Success");
+
       return "admin";
+
     }
 
-    // Employee Login Check
+    // -------------------------------
+    // Employee Check
+    // -------------------------------
     const employee = userData.employees.find(
-      (e) => e.email === email && e.password === password
+
+      (e) =>
+
+        e.email === email &&
+        e.password === password
+
     );
 
+    // Employee Login Success
     if (employee) {
-      console.log("Employee login success");
+
+      console.log("Employee Login Success");
+
       return "employee";
+
     }
 
-    console.log("Login failed - Invalid credentials");
+    // Login Failed
+    console.log("Invalid Login");
+
     return null;
+
   };
 
-  // ✅ Create Task function
+  // ==========================================
+  // Create Task Function
+  // ==========================================
   const createTask = (taskData) => {
+
+    // Employees Loop
     const updatedEmployees = userData.employees.map((emp) => {
+
+      // योग्य Employee मिळाला का?
       if (emp.email === taskData.assignTo) {
+
         return {
+
           ...emp,
+
+          // जुन्या Tasks Copy
           tasks: [
+
             ...emp.tasks,
+
+            // नवीन Task Add
             {
+
               title: taskData.title,
+
               description: taskData.description,
+
               date: taskData.date,
-              category: taskData.category || "General",
+
+              category:
+
+                taskData.category || "General",
+
               status: "new",
+
             },
+
           ],
+
         };
+
       }
+
       return emp;
+
     });
 
+    // New Data तयार
     const updatedData = {
+
       ...userData,
+
       employees: updatedEmployees,
+
     };
 
+    // State Update
     setUserData(updatedData);
-    localStorage.setItem("employees", JSON.stringify(updatedEmployees));
+
+    // Local Storage Update
+    localStorage.setItem(
+
+      "employees",
+
+      JSON.stringify(updatedEmployees)
+
+    );
+
   };
 
-  // ✅ Update Task Status function
-  const updateTaskStatus = (employeeEmail, taskIndex, newStatus) => {
-    const updatedEmployees = userData.employees.map((emp) => {
-      if (emp.email === employeeEmail) {
-        const updatedTasks = emp.tasks.map((task, index) => {
-          if (index === taskIndex) {
-            return { ...task, status: newStatus };
-          }
-          return task;
-        });
-        return { ...emp, tasks: updatedTasks };
-      }
-      return emp;
-    });
+  // ==========================================
+  // Update Task Status
+  // ==========================================
+  const updateTaskStatus = (
 
+    employeeEmail,
+
+    taskIndex,
+
+    newStatus
+
+  ) => {
+
+    const updatedEmployees =
+
+      userData.employees.map((emp) => {
+
+        // योग्य Employee
+        if (emp.email === employeeEmail) {
+
+          // Tasks Loop
+          const updatedTasks =
+
+            emp.tasks.map((task, index) => {
+
+              // योग्य Task
+              if (index === taskIndex) {
+
+                return {
+
+                  ...task,
+
+                  status: newStatus,
+
+                };
+
+              }
+
+              return task;
+
+            });
+
+          return {
+
+            ...emp,
+
+            tasks: updatedTasks,
+
+          };
+
+        }
+
+        return emp;
+
+      });
+
+    // Updated Data
     const updatedData = {
+
       ...userData,
+
       employees: updatedEmployees,
+
     };
 
+    // State Update
     setUserData(updatedData);
-    localStorage.setItem("employees", JSON.stringify(updatedEmployees));
+
+    // Local Storage Update
+    localStorage.setItem(
+
+      "employees",
+
+      JSON.stringify(updatedEmployees)
+
+    );
+
   };
 
-  // ✅ सर्व functions आणि data context मध्ये pass करा
+  // ==========================================
+  // Context Provider
+  // ==========================================
   return (
+
     <AuthContext.Provider
+
       value={{
-        ...userData,           // employees, admin
+
+        // Employees आणि Admin
+        ...userData,
+
+        // Loading State
         loading,
-        handleLogin,           // ✅ login function
-        createTask,            // ✅ create task function
-        updateTaskStatus,      // ✅ update status function
+
+        // Login Function
+        handleLogin,
+
+        // Create Task
+        createTask,
+
+        // Update Status
+        updateTaskStatus,
+
       }}
+
     >
+
+      {/* App चे सर्व Components */}
       {children}
+
     </AuthContext.Provider>
+
   );
+
 }
