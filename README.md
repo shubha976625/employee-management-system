@@ -97,16 +97,7 @@ npm run build
 
 ---
 
-## 📸 Screenshots
 
-> Add screenshots of:
->
-> - Login Page
-> - Admin Dashboard
-> - Employee Dashboard
-> - Task Management
-
----
 
 ## 📌 Future Improvements
 
